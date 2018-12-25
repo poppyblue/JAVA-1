@@ -6,7 +6,6 @@ import java.awt.Color.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.awt.Graphics2D;
 abstract class Shape implements Serializable {
     public abstract void draw(Graphics g);
 }
@@ -57,6 +56,7 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 	int lastx, lasty;              
 	int prex, prey;  
 	int type = 1;  
+	static boolean SW = false;
 	Color color = Color.black; // 画笔颜色
 	PopupMenu popup; //弹出菜单
 	
@@ -69,10 +69,12 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 			popup.add(mi); //将菜单项加入弹出菜单中
 		}
 		this.add(popup); //将弹出菜单附在画布上。
+		
 		connect(); 
 		new Thread(this).start(); 
 		this.addMouseListener(new MouseAdapter() {
 		public void mousePressed(MouseEvent e) { 
+			Graphics g = getGraphics();
 			lastx = e.getX(); lasty = e.getY();
 			prex = lastx; prey = lasty;
         }
@@ -91,26 +93,49 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 			Graphics g = getGraphics();
 			g.setColor(color);
 			g.setXORMode(getBackground());
-			if (type==1)
-				g.drawLine(lastx,lasty,prex,prey); //擦除原直线
-			else if(type==2)
-				g.drawOval(lastx,lasty,prex-lastx,prey-lasty);
-			else if(type==3)
-				g.drawRect(lastx,lasty,prex-lastx,prey-lasty);
+			if ( type==1)
+				g.drawLine(lastx,lasty,prex,prey); 
+			else if(type==2) {
+				if (WhiteBoard.SW) {
+    	 				g.fillOval(lastx,lasty,prex-lastx,prey-lasty);
+     				}else {
+     					g.drawOval(lastx,lasty,prex-lastx,prey-lasty);
+     			}				
+			}
+			else if(type==3) {
+				if (WhiteBoard.SW) {
+					g.fillRect(lastx,lasty,prex-lastx,prey-lasty);
+ 				}else {
+ 					g.drawRect(lastx,lasty,prex-lastx,prey-lasty);
+ 				}	
+			}
 			
 			int x = e.getX(), y = e.getY();
 			if (type==1)
-				g.drawLine(lastx,lasty,x,y); //绘制新直线
-			else if(type==2)
-				g.drawOval(lastx,lasty,x-lastx,y-lasty);
-			else if(type==3)
-				g.drawRect(lastx,lasty,x-lastx,y-lasty);
-			else if(type==4)
-				g.fillOval(prex,prey,4,4);//连续的线
-			else if(type==5)
-			{
-				g.setColor(Color.black);//其实我感觉是white
-				g.fillRect(prex, prey, 4, 4);//覆盖不了
+				g.drawLine(lastx,lasty,x,y); 
+			else if(type==2) {
+				if(WhiteBoard.SW) {
+					g.fillOval(lastx,lasty,x-lastx,y-lasty);
+				} else {
+					g.drawOval(lastx,lasty,x-lastx,y-lasty);
+				}				
+			}
+			
+			else if(type==3) {
+				if(WhiteBoard.SW) {
+					g.fillRect(lastx,lasty,x-lastx,y-lasty);
+				} else {
+					g.drawRect(lastx,lasty,x-lastx,y-lasty);
+				}	
+			}
+				
+			else if(type==4) {
+				g.setPaintMode();
+				g.setColor(getBackground());
+				g.fillRect(x, y, 8,8);
+			}
+			else if(type==5) {
+				g.fillOval(lastx, lasty, 4, 4);
 			}
 			prex = x; prey = y;
         }
@@ -146,6 +171,7 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
      } catch(Exception e) {System.out.println(e); }
    }
 
+   
    public void run() { 
        try {
           byte[ ] data = new byte[100]; 
@@ -189,18 +215,21 @@ Shape p = (Shape)is.readObject();
 
    public static void main(String[ ] args) {
         Frame x = new  Frame();
-        Button line = new Button("Line");
+        Button eraser=new Button("Eraser");
+        Button dot=new Button("Dot");
+        Button line = new Button("line");
         Button oval = new Button("Oval");
 		Button rect=new Button("Rect");
-		Button curve=new Button("Curve");
-		Button eraser=new Button("Eraser");
+		Button fill = new Button("fill");
+		
         Panel p = new Panel();
         x.add("South",p);
+    	p.add(eraser);
+    	p.add(dot);
         p.add(line);
 		p.add(oval);
 		p.add(rect);
-		p.add(curve);
-		p.add(eraser);
+		p.add(fill);
         WhiteBoard b = new  WhiteBoard();
         x.add(b);
         x.addWindowListener(new WindowAdapter(){  
@@ -208,6 +237,7 @@ Shape p = (Shape)is.readObject();
                 System.exit(0);  
             }  
             }); 
+        
         line.addActionListener(new ActionListener(){
            public void actionPerformed(ActionEvent e){
                b.type = 1;              
@@ -223,16 +253,22 @@ Shape p = (Shape)is.readObject();
 				b.type=3;
 			}
 		});
-		curve.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		eraser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				b.type=4;
 			}
 		});
-		eraser.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				b.type=5;
-			}
-		});
+		
+		fill.addActionListener(new ActionListener(){
+	           public void actionPerformed(ActionEvent e){
+	        	   WhiteBoard.SW = !WhiteBoard.SW;
+	           }
+	        });
+		dot.addActionListener(new ActionListener(){
+	           public void actionPerformed(ActionEvent e){
+	        	   b.type=5;
+	           }
+	        });
         x.setSize(500,500);
         x.setVisible(true);
 }
