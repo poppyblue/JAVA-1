@@ -1,4 +1,4 @@
-package homework;
+package hello1;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -6,6 +6,7 @@ import java.awt.Color.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.awt.Graphics2D;
 abstract class Shape implements Serializable {
     public abstract void draw(Graphics g);
 }
@@ -68,7 +69,6 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 			popup.add(mi); //将菜单项加入弹出菜单中
 		}
 		this.add(popup); //将弹出菜单附在画布上。
-		
 		connect(); 
 		new Thread(this).start(); 
 		this.addMouseListener(new MouseAdapter() {
@@ -91,19 +91,22 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 			Graphics g = getGraphics();
 			g.setColor(color);
 			g.setXORMode(getBackground());
-			if ( type==1)
-				g.drawLine(lastx,lasty,prex,prey); 
+			if (type==1)
+				g.drawLine(lastx,lasty,prex,prey); //擦除原直线
 			else if(type==2)
 				g.drawOval(lastx,lasty,prex-lastx,prey-lasty);
 			else if(type==3)
 				g.drawRect(lastx,lasty,prex-lastx,prey-lasty);
+			
 			int x = e.getX(), y = e.getY();
 			if (type==1)
-				g.drawLine(lastx,lasty,x,y); 
+				g.drawLine(lastx,lasty,x,y); //绘制新直线
 			else if(type==2)
 				g.drawOval(lastx,lasty,x-lastx,y-lasty);
 			else if(type==3)
 				g.drawRect(lastx,lasty,x-lastx,y-lasty);
+			else if(type==4)
+				g.fillOval(prex,prey,4,4);//连续的线
 			prex = x; prey = y;
         }
       });
@@ -181,14 +184,16 @@ Shape p = (Shape)is.readObject();
 
    public static void main(String[ ] args) {
         Frame x = new  Frame();
-        Button line = new Button("line");
+        Button line = new Button("Line");
         Button oval = new Button("Oval");
 		Button rect=new Button("Rect");
+		Button curve=new Button("Curve");
         Panel p = new Panel();
         x.add("South",p);
         p.add(line);
 		p.add(oval);
 		p.add(rect);
+		p.add(curve);
         WhiteBoard b = new  WhiteBoard();
         x.add(b);
         x.addWindowListener(new WindowAdapter(){  
@@ -209,6 +214,11 @@ Shape p = (Shape)is.readObject();
 		rect.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				b.type=3;
+			}
+		});
+		curve.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				b.type=4;
 			}
 		});
         x.setSize(500,500);
