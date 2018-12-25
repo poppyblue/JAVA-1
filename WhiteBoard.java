@@ -73,6 +73,7 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 		new Thread(this).start(); 
 		this.addMouseListener(new MouseAdapter() {
 		public void mousePressed(MouseEvent e) { 
+			Graphics g = getGraphics();
 			lastx = e.getX(); lasty = e.getY();
 			prex = lastx; prey = lasty;
         }
@@ -104,6 +105,11 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 				g.drawOval(lastx,lasty,x-lastx,y-lasty);
 			else if(type==3)
 				g.drawRect(lastx,lasty,x-lastx,y-lasty);
+			else if(type==4) {
+				g.setPaintMode();
+				g.setColor(getBackground());
+				g.fillRect(x, y, 8,8);
+			}
 			prex = x; prey = y;
         }
       });
@@ -138,6 +144,7 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
      } catch(Exception e) {System.out.println(e); }
    }
 
+   
    public void run() { 
        try {
           byte[ ] data = new byte[100]; 
@@ -181,11 +188,14 @@ Shape p = (Shape)is.readObject();
 
    public static void main(String[ ] args) {
         Frame x = new  Frame();
+        Button eraser=new Button("Eraser");
         Button line = new Button("line");
         Button oval = new Button("Oval");
 		Button rect=new Button("Rect");
+		
         Panel p = new Panel();
         x.add("South",p);
+    	p.add(eraser);
         p.add(line);
 		p.add(oval);
 		p.add(rect);
@@ -196,6 +206,7 @@ Shape p = (Shape)is.readObject();
                 System.exit(0);  
             }  
             }); 
+        
         line.addActionListener(new ActionListener(){
            public void actionPerformed(ActionEvent e){
                b.type = 1;              
@@ -211,6 +222,12 @@ Shape p = (Shape)is.readObject();
 				b.type=3;
 			}
 		});
+		eraser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				b.type=4;
+			}
+		}
+		);
         x.setSize(500,500);
         x.setVisible(true);
 }
