@@ -56,6 +56,7 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 	int lastx, lasty;              
 	int prex, prey;  
 	int type = 1;  
+	static boolean SW = false;
 	Color color = Color.black; // 画笔颜色
 	PopupMenu popup; //弹出菜单
 	
@@ -94,17 +95,40 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 			g.setXORMode(getBackground());
 			if ( type==1)
 				g.drawLine(lastx,lasty,prex,prey); 
-			else if(type==2)
-				g.drawOval(lastx,lasty,prex-lastx,prey-lasty);
-			else if(type==3)
-				g.drawRect(lastx,lasty,prex-lastx,prey-lasty);
+			else if(type==2) {
+				if (WhiteBoard.SW) {
+    	 				g.fillOval(lastx,lasty,prex-lastx,prey-lasty);
+     				}else {
+     					g.drawOval(lastx,lasty,prex-lastx,prey-lasty);
+     			}				
+			}
+			else if(type==3) {
+				if (WhiteBoard.SW) {
+					g.fillRect(lastx,lasty,prex-lastx,prey-lasty);
+ 				}else {
+ 					g.drawRect(lastx,lasty,prex-lastx,prey-lasty);
+ 				}	
+			}
+			
 			int x = e.getX(), y = e.getY();
 			if (type==1)
 				g.drawLine(lastx,lasty,x,y); 
-			else if(type==2)
-				g.drawOval(lastx,lasty,x-lastx,y-lasty);
-			else if(type==3)
-				g.drawRect(lastx,lasty,x-lastx,y-lasty);
+			else if(type==2) {
+				if(WhiteBoard.SW) {
+					g.fillOval(lastx,lasty,x-lastx,y-lasty);
+				} else {
+					g.drawOval(lastx,lasty,x-lastx,y-lasty);
+				}				
+			}
+			
+			else if(type==3) {
+				if(WhiteBoard.SW) {
+					g.fillRect(lastx,lasty,x-lastx,y-lasty);
+				} else {
+					g.drawRect(lastx,lasty,x-lastx,y-lasty);
+				}	
+			}
+				
 			else if(type==4) {
 				g.setPaintMode();
 				g.setColor(getBackground());
@@ -192,6 +216,7 @@ Shape p = (Shape)is.readObject();
         Button line = new Button("line");
         Button oval = new Button("Oval");
 		Button rect=new Button("Rect");
+		Button fill = new Button("fill");
 		
         Panel p = new Panel();
         x.add("South",p);
@@ -199,6 +224,7 @@ Shape p = (Shape)is.readObject();
         p.add(line);
 		p.add(oval);
 		p.add(rect);
+		p.add(fill);
         WhiteBoard b = new  WhiteBoard();
         x.add(b);
         x.addWindowListener(new WindowAdapter(){  
@@ -226,8 +252,13 @@ Shape p = (Shape)is.readObject();
 			public void actionPerformed(ActionEvent e) {
 				b.type=4;
 			}
-		}
-		);
+		});
+		
+		fill.addActionListener(new ActionListener(){
+	           public void actionPerformed(ActionEvent e){
+	        	   WhiteBoard.SW = !WhiteBoard.SW;
+	           }
+	        });
         x.setSize(500,500);
         x.setVisible(true);
 }
