@@ -1,4 +1,8 @@
-package hello1;
+
+
+
+package homework;
+
 
 import java.awt.*;
 import java.awt.event.*;
@@ -134,9 +138,12 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 				g.setColor(getBackground());
 				g.fillRect(x, y, 8,8);
 			}
+
 			else if(type==5) {
 				g.fillOval(lastx, lasty, 4, 4);
 			}
+
+
 			prex = x; prey = y;
         }
       });
@@ -216,7 +223,10 @@ Shape p = (Shape)is.readObject();
    public static void main(String[ ] args) {
         Frame x = new  Frame();
         Button eraser=new Button("Eraser");
+
         Button dot=new Button("Dot");
+
+
         Button line = new Button("line");
         Button oval = new Button("Oval");
 		Button rect=new Button("Rect");
@@ -225,7 +235,9 @@ Shape p = (Shape)is.readObject();
         Panel p = new Panel();
         x.add("South",p);
     	p.add(eraser);
+
     	p.add(dot);
+
         p.add(line);
 		p.add(oval);
 		p.add(rect);
@@ -264,6 +276,7 @@ Shape p = (Shape)is.readObject();
 	        	   WhiteBoard.SW = !WhiteBoard.SW;
 	           }
 	        });
+
 		dot.addActionListener(new ActionListener(){
 	           public void actionPerformed(ActionEvent e){
 	        	   b.type=5;
