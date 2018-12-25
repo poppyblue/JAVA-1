@@ -107,6 +107,11 @@ public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 				g.drawRect(lastx,lasty,x-lastx,y-lasty);
 			else if(type==4)
 				g.fillOval(prex,prey,4,4);//连续的线
+			else if(type==5)
+			{
+				g.setColor(Color.black);//其实我感觉是white
+				g.fillRect(prex, prey, 4, 4);//覆盖不了
+			}
 			prex = x; prey = y;
         }
       });
@@ -188,12 +193,14 @@ Shape p = (Shape)is.readObject();
         Button oval = new Button("Oval");
 		Button rect=new Button("Rect");
 		Button curve=new Button("Curve");
+		Button eraser=new Button("Eraser");
         Panel p = new Panel();
         x.add("South",p);
         p.add(line);
 		p.add(oval);
 		p.add(rect);
 		p.add(curve);
+		p.add(eraser);
         WhiteBoard b = new  WhiteBoard();
         x.add(b);
         x.addWindowListener(new WindowAdapter(){  
@@ -219,6 +226,11 @@ Shape p = (Shape)is.readObject();
 		curve.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				b.type=4;
+			}
+		});
+		eraser.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				b.type=5;
 			}
 		});
         x.setSize(500,500);
