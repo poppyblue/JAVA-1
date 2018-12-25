@@ -22,7 +22,7 @@ class Line extends  Shape{
        g.drawLine(startX,startY, endX,endY);
 }
 }
-class Oval extends Shape{  //��Բ
+class Oval extends Shape{  
     int startX,startY;
     int  width,height;
 
@@ -35,7 +35,7 @@ class Oval extends Shape{  //��Բ
        g.drawOval(startX,startY,width,height);
 }
 }
-class Rect extends Shape{//����
+class Rect extends Shape{
 	int  startX,startY;
 	int width,height;
 	public Rect(int x1,int y1,int x2,int y2){
@@ -49,20 +49,30 @@ class Rect extends Shape{//����
 	}
 }
 
-public class WhiteBoard extends Canvas implements Runnable{
+public class WhiteBoard extends Canvas implements Runnable,ActionListener{
 	MulticastSocket mSocket;  
 	InetAddress inetAddress;   
 	ArrayList<Shape> graphs = new ArrayList<>(); 
 	int lastx, lasty;              
 	int prex, prey;  
 	int type = 1;  
-
+	Color color = Color.black; // 画笔颜色
+	PopupMenu popup; //弹出菜单
+	
 	public WhiteBoard() {
+		popup=new PopupMenu("Color");
+		String labels[]={"Clear", "Red", "Green", "Blue", "Black"}; 
+		for(int i = 0; i < labels.length; i++) {
+			MenuItem mi = new MenuItem(labels[i]); //创建菜单项
+			mi.addActionListener(this); //给菜单项注册动作监听者
+			popup.add(mi); //将菜单项加入弹出菜单中
+		}
+		this.add(popup); //将弹出菜单附在画布上。
+		
 		connect(); 
 		new Thread(this).start(); 
 		this.addMouseListener(new MouseAdapter() {
-	public void mousePressed(MouseEvent e) { 
-
+		public void mousePressed(MouseEvent e) { 
 			lastx = e.getX(); lasty = e.getY();
 			prex = lastx; prey = lasty;
         }
@@ -79,6 +89,7 @@ public class WhiteBoard extends Canvas implements Runnable{
      this.addMouseMotionListener(new MouseMotionAdapter() {
 		public void mouseDragged(MouseEvent e) {      
 			Graphics g = getGraphics();
+			g.setColor(color);
 			g.setXORMode(getBackground());
 			if ( type==1)
 				g.drawLine(lastx,lasty,prex,prey); 
@@ -97,7 +108,13 @@ public class WhiteBoard extends Canvas implements Runnable{
         }
       });
 }
- 
+  public void processMouseEvent(MouseEvent e){
+	  if(e.isPopupTrigger())
+		  popup.show(this, e.getX(), e.getY());
+	  else super.processMouseEvent(e);
+  }
+  
+  
    public void connect() {  
     try {
  		 mSocket = new MulticastSocket(7777);
@@ -138,6 +155,19 @@ Shape p = (Shape)is.readObject();
 	} catch (Exception e) { System.out.println(e);}
    }
 
+   public void actionPerformed(ActionEvent e) { //实现弹出式接口
+	   String name =((MenuItem)e.getSource()).getLabel();
+	   if(name.equals("Clear")) { //清除画面
+		   Graphics g = this.getGraphics();
+		   g.setColor(this.getBackground());
+		   g.fillRect(0, 0, this.getSize().width,this.getSize().height);
+	   }
+	   else if(name.equals("Red")) color=Color.red;
+	   else if(name.equals("Green")) color=Color.green;
+	   else if(name.equals("Blue")) color=Color.blue;
+	   else if(name.equals("Black")) color=Color.black;
+   }
+   
    public void drawGraph(Shape p) { 
 		Graphics g = getGraphics();  
 		p.draw(g);
@@ -176,7 +206,105 @@ Shape p = (Shape)is.readObject();
                b.type = 2;              
            }
         });
-		rect.addActionListener(new ActionListener(){
+		rect.addActionListener(new ActionListener(){package homework;
+2
+​
+3
+import java.awt.*;
+4
+import java.awt.event.*;
+5
+import java.awt.Color.*;
+6
+import java.io.*;
+7
+import java.net.*;
+8
+import java.util.*;
+9
+abstract class Shape implements Serializable {
+10
+    public abstract void draw(Graphics g);
+11
+}
+12
+class Line extends  Shape{
+13
+        int startX,startY;
+14
+    int endX,endY;
+15
+​
+16
+    public Line(int x1,int y1 ,int x2 ,int y2){
+17
+        startX = x1; startY = y1;
+18
+        endX = x2; endY = y2;
+19
+    }  
+20
+​
+21
+    public void draw(Graphics g){       
+22
+       g.drawLine(startX,startY, endX,endY);
+23
+}
+24
+}
+25
+class Oval extends Shape{  //��Բ
+26
+    int startX,startY;
+27
+    int  width,height;
+28
+​
+29
+    public Oval(int x1,int y1 ,int x2 ,int y2){
+30
+        startX = x1; startY = y1;
+31
+        width = x2;  height= y2;
+32
+    }  
+33
+​
+34
+    public void draw(Graphics g){       
+35
+       g.drawOval(startX,startY,width,height);
+36
+}
+37
+}
+38
+class Rect extends Shape{//����
+39
+        int  startX,startY;
+40
+        int width,height;
+41
+        public Rect(int x1,int y1,int x2,int y2){
+42
+                startX=x1;
+43
+                startY=y1;
+44
+                width=x2;
+45
+                height=y2;
+46
+        }
+47
+        public void draw(Graphics g){
+48
+                g.drawRect(startX,startY,width,height);
+49
+        }
+50
+}
 			public void actionPerformed(ActionEvent e){
 				b.type=3;
 			}
